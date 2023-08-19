@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 
 
+
 def convert_rarity_to_probability(df, weight_dict):
     probs = np.zeros(len(df))
     for i, rarity in enumerate(df['Rarity']):
@@ -23,20 +24,21 @@ def draw_sample(df, nmax=1, bias=8):
         return choices[0]
     else:
         return choices
-            
+           
 
-
-def format_results(gender, ancestry, profession_list):
-    gstr = gender.title()
-    astr = ancestry.title()
+def format_results(gender, ancestry, profession_list, alignment):
+    gstr = gender.lower()
+    astr = ancestry.lower()
     if len(profession_list)==1:
-        pstr = profession_list[0].title()
+        pstr = profession_list[0].lower()
     else:
-        pstr = profession_list[0].title() + ' (former %s)'%profession_list[1].title()
-    if gstr.startswith('a'):
-        return 'An %s %s %s'%(gstr, astr, pstr)
+        pstr = profession_list[0].lower() + ' (former %s)'%profession_list[1].title()
+    asplit = tuple(alignment.split('-'))
+    xstr = 'They exhibit %s, sometimes manifesting as %s'%asplit
+    if gstr.startswith('A'):
+        return 'An %s %s %s. %s.'%(gstr, astr, pstr, xstr)
     else:
-        return 'A %s %s %s'%(gstr, astr, pstr)
+        return 'A %s %s %s. %s.'%(gstr, astr, pstr, xstr)
 
 
 st.title('Welcome to Jack\'s character generator')
@@ -45,6 +47,7 @@ st.title('Welcome to Jack\'s character generator')
 df_prof = pd.read_csv('./Data/professions.csv')
 df_ancestry = pd.read_csv('./Data/ancestries.csv')
 df_gender = pd.read_csv('./Data/genders.csv')
+df_align = pd.read_csv('./Data/alignments.csv')
 
 wd = {'none': 0,
       'common': 20,
@@ -63,7 +66,7 @@ with st.sidebar:
     wd['rare'] = w_rare
     wd['very rare'] = w_vrare
     
-for df in [df_ancestry, df_prof, df_gender]:
+for df in [df_ancestry, df_prof, df_gender, df_align]:
     convert_rarity_to_probability(df, wd)
     
     
@@ -75,5 +78,6 @@ if st.button('Generate!'):
         if ancestry=='genasi':
             ancestry = 'genasi (%s)'%draw_sample(df_ancestry, nmax=1)
         profession_list = draw_sample(df_prof, nmax=2, bias=4)
-        character = format_results(gender, ancestry, profession_list)
+        alignment = draw_sample(df_align, nmax=1)
+        character = format_results(gender, ancestry, profession_list, alignment)
         st.write(character)
