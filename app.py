@@ -39,7 +39,7 @@ def format_results(gender, ancestry, profession_list):
         return 'A %s %s %s'%(gstr, astr, pstr)
 
 
-st.title('Welcome to the character generator')
+st.title('Welcome to Jack\'s character generator')
 
 
 df_prof = pd.read_csv('./Data/professions.csv')
