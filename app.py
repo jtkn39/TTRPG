@@ -26,7 +26,7 @@ def draw_sample(df, nmax=1, bias=8):
         return choices
            
 
-def format_results(gender, ancestry, profession_list, alignment):
+def format_results(gender, ancestry, profession_list, alignment, drawback, p_db):
     gstr = gender.lower()
     astr = ancestry.lower()
     if len(profession_list)==1:
@@ -34,11 +34,13 @@ def format_results(gender, ancestry, profession_list, alignment):
     else:
         pstr = profession_list[0].lower() + ' (former %s)'%profession_list[1].lower()
     asplit = tuple(alignment.split('-'))
-    xstr = 'They exhibit %s, sometimes manifesting as %s'%asplit
+    xstr = 'They exhibit %s, sometimes manifesting as %s.'%asplit
+    if np.random.random_sample()<p_db:
+        xstr += ' They %s.'%drawback
     if gstr.startswith('a'):
-        return 'An %s %s %s. %s.'%(gstr, astr, pstr, xstr)
+        return 'An %s %s %s. %s'%(gstr, astr, pstr, xstr)
     else:
-        return 'A %s %s %s. %s.'%(gstr, astr, pstr, xstr)
+        return 'A %s %s %s. %s'%(gstr, astr, pstr, xstr)
 
 
 st.title('Welcome to Jack\'s character generator')
@@ -48,29 +50,31 @@ df_prof = pd.read_csv('./Data/professions.csv')
 df_ancestry = pd.read_csv('./Data/ancestries.csv')
 df_gender = pd.read_csv('./Data/genders.csv')
 df_align = pd.read_csv('./Data/alignments.csv')
+df_db = pd.read_csv('./Data/drawbacks.csv')
 
 wd = {'none': 0,
-      'common': 20,
-      'uncommon': 10,
-      'rare': 3,
+      'common': 8,
+      'uncommon': 4,
+      'rare': 2,
       'very rare': 1}
     
 with st.sidebar:
     st.write('Adjust weightings for different rarities')
-    w_common = st.slider('Common', 1, 100, 20)
-    w_uncommon = st.slider('Uncommon', 1, w_common, 10)
-    w_rare = st.slider('Rare', 1, w_uncommon, 3)
-    w_vrare = st.slider('Very rare', 1, w_rare, 1)
+    w_common = st.slider('Common', 1, 100, wd['common'])
+    w_uncommon = st.slider('Uncommon', 1, w_common, wd['uncommon'])
+    w_rare = st.slider('Rare', 1, w_uncommon, wd['rare'])
+    w_vrare = st.slider('Very rare', 1, w_rare, wd['very rare'])
     wd['common'] = w_common
     wd['uncommon'] = w_uncommon
     wd['rare'] = w_rare
     wd['very rare'] = w_vrare
+    p_db = st.slider('Probability of having a drawback', 0.0, 1.0, 0.5)
     
-for df in [df_ancestry, df_prof, df_gender, df_align]:
+for df in [df_ancestry, df_prof, df_gender, df_align, df_db]:
     convert_rarity_to_probability(df, wd)
     
     
-num_char = st.slider('How many characters would you like to generate?', 1, 8, 3)
+num_char = st.slider('How many characters would you like to generate?', 1, 5, 3)
 if st.button('Generate!'):
     for _ in range(num_char):
         gender = draw_sample(df_gender, nmax=1)
@@ -79,5 +83,6 @@ if st.button('Generate!'):
             ancestry = 'genasi (%s)'%draw_sample(df_ancestry, nmax=1)
         profession_list = draw_sample(df_prof, nmax=2, bias=4)
         alignment = draw_sample(df_align, nmax=1)
-        character = format_results(gender, ancestry, profession_list, alignment)
+        drawback = draw_sample(df_db, nmax=1)
+        character = format_results(gender, ancestry, profession_list, alignment, drawback, p_db)
         st.write(character)
