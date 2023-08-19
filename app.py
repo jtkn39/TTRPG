@@ -35,7 +35,7 @@ def format_results(gender, ancestry, profession_list, alignment):
         pstr = profession_list[0].lower() + ' (former %s)'%profession_list[1].title()
     asplit = tuple(alignment.split('-'))
     xstr = 'They exhibit %s, sometimes manifesting as %s'%asplit
-    if gstr.startswith('A'):
+    if gstr.startswith('a'):
         return 'An %s %s %s. %s.'%(gstr, astr, pstr, xstr)
     else:
         return 'A %s %s %s. %s.'%(gstr, astr, pstr, xstr)
