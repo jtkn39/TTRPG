@@ -43,6 +43,7 @@ def format_results(gender, ancestry, profession_list, alignment, drawback, p_db)
         return 'A %s %s %s. %s'%(gstr, astr, pstr, xstr)
 
 
+st.set_page_config(initial_sidebar_state='collapsed')    
 st.title('Welcome to Jack\'s character generator')
 
 
@@ -74,7 +75,7 @@ for df in [df_ancestry, df_prof, df_gender, df_align, df_db]:
     convert_rarity_to_probability(df, wd)
     
     
-num_char = st.slider('How many characters would you like to generate?', 1, 5, 3)
+num_char = st.slider('How many characters would you like to generate?', 1, 5, 1)
 if st.button('Generate!'):
     for _ in range(num_char):
         gender = draw_sample(df_gender, nmax=1)
