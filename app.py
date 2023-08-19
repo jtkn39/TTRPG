@@ -26,7 +26,8 @@ def draw_sample(df, nmax=1, bias=8):
         return choices
            
 
-def format_results(gender, ancestry, profession_list, alignment, drawback, p_db):
+def format_results(gender, ancestry, profession_list, alignment,
+                   drawback, p_db, disorder, p_dis):
     gstr = gender.lower()
     astr = ancestry.lower()
     if len(profession_list)==1:
@@ -37,6 +38,8 @@ def format_results(gender, ancestry, profession_list, alignment, drawback, p_db)
     xstr = 'They exhibit %s, sometimes manifesting as %s.'%asplit
     if np.random.random_sample()<p_db:
         xstr += ' They %s.'%drawback
+    if np.random.random_sample()<p_dis:
+        xstr += ' They %s.'%disorder
     if gstr.startswith('a'):
         return 'An %s %s %s. %s'%(gstr, astr, pstr, xstr)
     else:
@@ -52,6 +55,7 @@ df_ancestry = pd.read_csv('./Data/ancestries.csv')
 df_gender = pd.read_csv('./Data/genders.csv')
 df_align = pd.read_csv('./Data/alignments.csv')
 df_db = pd.read_csv('./Data/drawbacks.csv')
+df_dis = pd.read_csv('./Data/disorders.csv')
 
 wd = {'none': 0,
       'common': 8,
@@ -70,8 +74,9 @@ with st.sidebar:
     wd['rare'] = w_rare
     wd['very rare'] = w_vrare
     p_db = st.slider('Probability of having a drawback', 0.0, 1.0, 0.5)
+    p_dis = st.slider('Probability of having a disorder', 0.0, 1.0, 0.1)
     
-for df in [df_ancestry, df_prof, df_gender, df_align, df_db]:
+for df in [df_ancestry, df_prof, df_gender, df_align, df_db, df_dis]:
     convert_rarity_to_probability(df, wd)
     
     
@@ -85,5 +90,7 @@ if st.button('Generate!'):
         profession_list = draw_sample(df_prof, nmax=2, bias=4)
         alignment = draw_sample(df_align, nmax=1)
         drawback = draw_sample(df_db, nmax=1)
-        character = format_results(gender, ancestry, profession_list, alignment, drawback, p_db)
+        disorder = draw_sample(df_dis, nmax=1)
+        character = format_results(gender, ancestry, profession_list, alignment,
+                                   drawback, p_db, disorder, p_dis)
         st.write(character)
