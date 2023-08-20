@@ -148,12 +148,16 @@ if 'character_list' not in st.session_state:
     
 
 
-if st.button('Generate!'):
+with st.form('Generate characters'):
         
     character_dict = create_character(df_list, option_weights)
     description = generate_character_description(character_dict)
     st.write(description)
-    st.button('Add character to roster', on_click=add_character_to_roster, args=(character_dict,))
+    add_character = st.checkbox('Add character to roster')
+    submitted = st.form_submit_button('Next!')
+    if submitted:
+        if add_character:
+            add_character_to_roster(character_dict)
 
 
 with st.expander('Show roster'):
