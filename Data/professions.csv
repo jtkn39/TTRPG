@@ -1,7 +1,7 @@
 Profession,Rarity
 clergy member,uncommon
 anarchist,rare
-anchorite,rare
+hermit,rare
 animal tamer,uncommon
 antiquarian,uncommon
 apothecary,uncommon
@@ -62,7 +62,7 @@ reeve,uncommon
 scribe,uncommon
 sellsword,common
 servant,common
-slayer,rare
+monster slayer,rare
 smuggler,rare
 squire,uncommon
 trapper,uncommon
@@ -114,4 +114,4 @@ truthsayer,uncommon
 veteran,common
 war dervish,rare
 warlock,rare
-white wolf,rare
+priest of a winter god,rare
