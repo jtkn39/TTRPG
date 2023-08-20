@@ -3,6 +3,14 @@ import pandas as pd
 import streamlit as st
 
 
+st.set_page_config(initial_sidebar_state='collapsed')
+
+
+@st.cache_data
+def convert_df(df):
+    return df.to_csv(index=False).encode('utf-8')
+
+
 
 def convert_rarity_to_probability(df, weight_dict):
     probs = np.zeros(len(df))
@@ -26,8 +34,9 @@ def draw_sample(df, nmax=1, bias=8):
         return choices
            
 
-def format_results(gender, ancestry, profession_list, alignment,
-                   drawback, p_db, disorder, p_dis):
+def format_results(age, gender, ancestry, profession_list, alignment,
+                   drawback, has_drawback, disorder, has_disorder):
+    agestr = age.lower()
     gstr = gender.lower()
     astr = ancestry.lower()
     if len(profession_list)==1:
@@ -36,17 +45,17 @@ def format_results(gender, ancestry, profession_list, alignment,
         pstr = profession_list[0].lower() + ' (former %s)'%profession_list[1].lower()
     asplit = tuple(alignment.split('-'))
     xstr = 'They exhibit %s, sometimes manifesting as %s.'%asplit
-    if np.random.random_sample()<p_db:
+    if has_drawback:
         xstr += ' They %s.'%drawback
-    if np.random.random_sample()<p_dis:
+    if has_disorder:
         xstr += ' They %s.'%disorder
-    if gstr.startswith('a'):
-        return 'An %s %s %s. %s'%(gstr, astr, pstr, xstr)
+    if agestr.startswith('a') or agestr.startswith('e'):
+        return 'An %s %s %s %s. %s'%(agestr, gstr, astr, pstr, xstr)
     else:
-        return 'A %s %s %s. %s'%(gstr, astr, pstr, xstr)
+        return 'A %s %s %s %s. %s'%(agestr, gstr, astr, pstr, xstr)
 
 
-st.set_page_config(initial_sidebar_state='collapsed')    
+
 st.title('Welcome to Jack\'s character generator')
 
 
@@ -56,9 +65,10 @@ df_gender = pd.read_csv('./Data/genders.csv')
 df_align = pd.read_csv('./Data/alignments.csv')
 df_db = pd.read_csv('./Data/drawbacks.csv')
 df_dis = pd.read_csv('./Data/disorders.csv')
+df_age = pd.read_csv('./Data/ages.csv')
 
 wd = {'none': 0,
-      'common': 8,
+      'common': 12,
       'uncommon': 4,
       'rare': 2,
       'very rare': 1}
@@ -76,13 +86,17 @@ with st.sidebar:
     p_db = st.slider('Probability of having a drawback', 0.0, 1.0, 0.5)
     p_dis = st.slider('Probability of having a disorder', 0.0, 1.0, 0.1)
     
-for df in [df_ancestry, df_prof, df_gender, df_align, df_db, df_dis]:
+for df in [df_ancestry, df_prof, df_gender, df_align, df_db, df_dis, df_age]:
     convert_rarity_to_probability(df, wd)
     
     
-num_char = st.slider('How many characters would you like to generate?', 1, 5, 1)
+num_char = st.slider('How many characters would you like to generate?', 1, 20, 1)
+columns = ['Name', 'Age', 'Gender', 'Ancestry', 'Profession', 'Former Profession',
+           'Alignment', 'Drawback', 'Disorder']
+df_out = pd.DataFrame(columns=columns, index=range(num_char))
 if st.button('Generate!'):
-    for _ in range(num_char):
+    for i in range(num_char):
+        age = draw_sample(df_age, nmax=1)
         gender = draw_sample(df_gender, nmax=1)
         ancestry = draw_sample(df_ancestry, nmax=1)
         if ancestry=='genasi':
@@ -91,6 +105,29 @@ if st.button('Generate!'):
         alignment = draw_sample(df_align, nmax=1)
         drawback = draw_sample(df_db, nmax=1)
         disorder = draw_sample(df_dis, nmax=1)
-        character = format_results(gender, ancestry, profession_list, alignment,
-                                   drawback, p_db, disorder, p_dis)
-        st.write(character)
+        samp1, samp2 = np.random.rand(2)
+        description = format_results(age, gender, ancestry, profession_list, alignment,
+                                   drawback, p_db>samp1, disorder, p_dis>samp2)
+        st.write(description)
+        df_out['Age'][i] = age
+        df_out['Gender'][i] = gender
+        df_out['Ancestry'][i] = ancestry
+        df_out['Profession'][i] = profession_list[0]
+        if len(profession_list)>1:
+            df_out['Former Profession'][i] = profession_list[1]
+        df_out['Alignment'][i] = alignment
+        if p_db>samp1:
+            df_out['Drawback'][i] = drawback
+        if p_dis>samp2:
+            df_out['Disorder'][i] = disorder
+            
+    csv = convert_df(df_out)
+
+    st.download_button(
+       "Press to Download",
+       csv,
+       "my_random_characters.csv",
+       "text/csv",
+       key='download-csv'
+    )
+        
