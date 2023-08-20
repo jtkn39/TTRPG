@@ -72,6 +72,7 @@ def create_character(df_list, optional_weights):
                 
 def generate_character_description(character_dict):
     age = character_dict['Age']
+    gender = character_dict['Gender']
     ancestry = character_dict['Ancestry']
     profession = character_dict['Profession']
     alignment = character_dict['Alignment']
@@ -79,7 +80,7 @@ def generate_character_description(character_dict):
     disorder = character_dict['Disorder']
     companion = character_dict['Companion']
     retainer = character_dict['Retainer']
-    output = 'They are a %s %s %s.  \n' %(age, ancestry, profession)
+    output = 'They are a %s %s %s %s.  \n' %(age, gender, ancestry, profession)
     if age.startswith('a') or age.startswith('e'):
         output = output.replace(' a ', ' an ')
     virtue, vice = alignment.split('-')
