@@ -35,7 +35,8 @@ def draw_sample(df, nmax=1, bias=8):
            
 
 def format_results(age, gender, ancestry, profession_list, alignment,
-                   drawback, has_drawback, disorder, has_disorder):
+                   drawback, has_drawback, disorder, has_disorder,
+                   companion, has_companion, retainer, has_retainer):
     agestr = age.lower()
     gstr = gender.lower()
     astr = ancestry.lower()
@@ -49,6 +50,10 @@ def format_results(age, gender, ancestry, profession_list, alignment,
         xstr += ' They %s.'%drawback
     if has_disorder:
         xstr += ' They %s.'%disorder
+    if has_companion:
+        xstr +=' They have a %s companion.'%companion.lower()
+    if has_retainer:
+        xstr +=' They have a %s retainer.'%retainer.lower()
     if agestr.startswith('a') or agestr.startswith('e'):
         return 'An %s %s %s %s. %s'%(agestr, gstr, astr, pstr, xstr)
     else:
@@ -66,6 +71,8 @@ df_align = pd.read_csv('./Data/alignments.csv')
 df_db = pd.read_csv('./Data/drawbacks.csv')
 df_dis = pd.read_csv('./Data/disorders.csv')
 df_age = pd.read_csv('./Data/ages.csv')
+df_companions = pd.read_csv('./Data/companions.csv')
+df_retainers = pd.read_csv('./Data/retainers.csv')
 
 wd = {'none': 0,
       'common': 12,
@@ -84,15 +91,18 @@ with st.sidebar:
     wd['rare'] = w_rare
     wd['very rare'] = w_vrare
     p_db = st.slider('Probability of having a drawback', 0.0, 1.0, 0.5)
-    p_dis = st.slider('Probability of having a disorder', 0.0, 1.0, 0.1)
+    p_dis = st.slider('Probability of having a disorder', 0.0, 1.0, 0.15)
+    p_comp = st.slider('Probability of having a companion', 0.0, 1.0, 0.2)
+    p_ret = st.slider('Probability of having a retainer', 0.0, 1.0, 0.1)
     
-for df in [df_ancestry, df_prof, df_gender, df_align, df_db, df_dis, df_age]:
+for df in [df_ancestry, df_prof, df_gender, df_align, df_db, 
+           df_dis, df_age, df_companions, df_retainers]:
     convert_rarity_to_probability(df, wd)
     
     
 num_char = st.slider('How many characters would you like to generate?', 1, 20, 1)
 columns = ['Name', 'Age', 'Gender', 'Ancestry', 'Profession', 'Former Profession',
-           'Alignment', 'Drawback', 'Disorder']
+           'Alignment', 'Drawback', 'Disorder', 'Companion', 'Retainer']
 df_out = pd.DataFrame(columns=columns, index=range(num_char))
 if st.button('Generate!'):
     for i in range(num_char):
@@ -105,9 +115,12 @@ if st.button('Generate!'):
         alignment = draw_sample(df_align, nmax=1)
         drawback = draw_sample(df_db, nmax=1)
         disorder = draw_sample(df_dis, nmax=1)
-        samp1, samp2 = np.random.rand(2)
+        companion = draw_sample(df_companions, nmax=1)
+        retainer = draw_sample(df_retainers, nmax=1)
+        samp1, samp2, samp3, samp4 = np.random.rand(4)
         description = format_results(age, gender, ancestry, profession_list, alignment,
-                                   drawback, p_db>samp1, disorder, p_dis>samp2)
+                                     drawback, p_db>samp1, disorder, p_dis>samp2,
+                                     companion, p_comp>samp3, retainer, p_ret>samp4)
         st.write(description)
         df_out['Age'][i] = age
         df_out['Gender'][i] = gender
@@ -120,6 +133,10 @@ if st.button('Generate!'):
             df_out['Drawback'][i] = drawback
         if p_dis>samp2:
             df_out['Disorder'][i] = disorder
+        if p_comp>samp3:
+            df_out['Companion'][i] = companion
+        if p_ret>samp4:
+            df_out['Retainer'][i] = retainer
             
     csv = convert_df(df_out)
 
