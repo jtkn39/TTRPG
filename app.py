@@ -3,22 +3,10 @@ import os
 import pandas as pd
 import streamlit as st
 
+# TODO - born locally or in a distant land?
+
 st.set_page_config(initial_sidebar_state='collapsed')
 
-@st.cache_data
-class Roster:
-    def __init__(self, nmax=500):
-        self.columns = ['Name', 'Age', 'Gender', 'Ancestry',
-                        'Profession', 'Alignment', 'Drawback',
-                        'Disorder', 'Companion', 'Retainer']
-        self.df = pd.DataFrame(columns=self.columns, index=range(nmax))
-        self.count = 0
-        
-    def add_character(self, character_dict):
-        for attr in self.columns[1:]:
-            if character_dict[attr] is not None:
-                self.df[attr][self.count] = character_dict[attr]
-        self.count += 1
 
 def convert_df(df):
     return df.to_csv(index=False).encode('utf-8')
@@ -128,8 +116,8 @@ for f_csv in flist_csv:
     
 with st.sidebar:
     st.write('Adjust weightings for different rarities')
-    p_db = st.slider('Probability of generating a drawback', 0.0, 1.0, 0.5)
-    p_dis = st.slider('Probability of generating a disorder', 0.0, 1.0, 0.15)
+    p_db = st.slider('Probability of generating a drawback', 0.0, 1.0, 1.0)
+    p_dis = st.slider('Probability of generating a disorder', 0.0, 1.0, 0.3)
     p_comp = st.slider('Probability of generating a companion', 0.0, 1.0, 0.1)
     p_ret = st.slider('Probability of generating a retainer', 0.0, 1.0, 0.0)
     option_weights = {'Drawback': p_db,
