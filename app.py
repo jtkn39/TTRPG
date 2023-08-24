@@ -68,6 +68,7 @@ def generate_character_description(character_dict):
     disorder = character_dict['Disorder']
     companion = character_dict['Companion']
     retainer = character_dict['Retainer']
+    displacement = character_dict['Displacement']
     output = 'They are a %s %s %s %s.  \n' %(age, gender, ancestry, profession)
     if age.startswith('a') or age.startswith('e'):
         output = output.replace(' a ', ' an ')
@@ -75,11 +76,12 @@ def generate_character_description(character_dict):
     output += 'They try to embody %s, but can lapse into %s.  \n'%(virtue, vice)
     for extra in [drawback, disorder]:
         if extra is not None:
-            output += 'They %s. '%extra
+            output += 'They %s.  \n'%extra
     for extra in [companion, retainer]:
         if extra is not None:
-            output += 'They have a %s companion.'%extra.lower()
+            output += 'They have a %s companion.  \n'%extra.lower()
             break
+    output += 'They %s.'%displacement
     return output.strip()
 
 def add_character_to_roster(character_dict):
@@ -91,7 +93,8 @@ def add_character_to_roster(character_dict):
 def delete_roster():
     columns = ['Name', 'Age', 'Gender', 'Ancestry',
                'Profession', 'Alignment', 'Drawback',
-               'Disorder', 'Companion', 'Retainer']
+               'Disorder', 'Companion', 'Retainer',
+               'Displacement']
     st.session_state.character_list = []
     st.session_state.df = pd.DataFrame(columns=columns)
 
@@ -130,7 +133,8 @@ num_prompt = 'How many characters would you like to generate?'
 
 columns = ['Name', 'Age', 'Gender', 'Ancestry',
            'Profession', 'Alignment', 'Drawback',
-           'Disorder', 'Companion', 'Retainer']
+           'Disorder', 'Companion', 'Retainer',
+           'Displacement']
 if 'character_list' not in st.session_state:
     st.session_state.character_list = []
     st.session_state.df = pd.DataFrame(columns=columns)
