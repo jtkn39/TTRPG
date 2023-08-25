@@ -82,19 +82,25 @@ def generate_character_description(character_dict):
             output += 'They have a %s companion.  \n'%extra.lower()
             break
     output += 'They %s.'%displacement
-    verbs = ['harbour', 'suffer', 'believe', 'hunger']
-    if gender.lower=='male':
+    verbs = ['harbour', 'suffer', 'believe', 'hunger', 'hear']
+    if gender.lower()=='male':
         output = output.replace('They try', 'He tries')
         output = output.replace('They are', 'He is')
         output = output.replace('They have', 'He has')
+        output = output.replace('They were', 'He was')
+        output = output.replace('their', 'his')
         for verb in verbs:
-            output = output.replace(verb, verb+'s')
-    elif gender.lower=='female':
+            output = output.replace('They '+verb, 'He '+verb+'s')
+        output = output.replace('They', 'He')
+    elif gender.lower()=='female':
         output = output.replace('They try', 'She tries')
         output = output.replace('They are', 'She is')
         output = output.replace('They have', 'She has')
+        output = output.replace('They were', 'She was')
+        output = output.replace('their', 'her')
         for verb in verbs:
-            output = output.replace(verb, verb+'s')
+            output = output.replace('They '+verb, 'She '+verb+'s')
+        output = output.replace('They', 'She')
     return output.strip()
 
 
