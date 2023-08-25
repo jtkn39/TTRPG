@@ -1,8 +1,10 @@
-Age,Rarity
-newborn,none
+Age,undefined
+69-year old,Rarity
 child,none
 teenage,uncommon
 adult,common
 middle-aged,common
 elderly,uncommon
 very elderly,rare
+ancient,very rare
+timeless,none
