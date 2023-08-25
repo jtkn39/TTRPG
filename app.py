@@ -69,7 +69,7 @@ def generate_character_description(character_dict):
     companion = character_dict['Companion']
     retainer = character_dict['Retainer']
     displacement = character_dict['Displacement']
-    output = 'They are a %s %s %s %s.  \n' %(age, gender, ancestry, profession)
+    output = 'This character is a %s %s %s %s.  \n' %(age, gender, ancestry, profession)
     if age.startswith('a') or age.startswith('e'):
         output = output.replace(' a ', ' an ')
     virtue, vice = alignment.split('-')
@@ -82,7 +82,21 @@ def generate_character_description(character_dict):
             output += 'They have a %s companion.  \n'%extra.lower()
             break
     output += 'They %s.'%displacement
+    verbs = ['harbour', 'suffer', 'believe', 'hunger']
+    if gender.lower=='male':
+        output = output.replace('They try', 'He tries')
+        output = output.replace('They are', 'He is')
+        output = output.replace('They have', 'He has')
+        for verb in verbs:
+            output = output.replace(verb, verb+'s')
+    elif gender.lower=='female':
+        output = output.replace('They try', 'She tries')
+        output = output.replace('They are', 'She is')
+        output = output.replace('They have', 'She has')
+        for verb in verbs:
+            output = output.replace(verb, verb+'s')
     return output.strip()
+
 
 def add_character_to_roster(character_dict):
     df_character = pd.DataFrame(character_dict, index=[0])
