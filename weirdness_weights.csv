@@ -1,6 +1,6 @@
-,low,medium,high
-none,0,0,1
-common,100,10,8
-uncommon,12,5,4
-rare,3,3,3
-very rare,1,1,2
+,Peasant Mode,Low,Medium,High,Madness
+none,0,0,0,1,2
+common,10,60,10,8,0.1
+uncommon,1,12,5,4,0.1
+rare,0,3,3,3,1
+very rare,0,1,1,2,2

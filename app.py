@@ -125,7 +125,8 @@ st.title('Welcome to Jack\'s character generator')
 df_weirdness = pd.read_csv('weirdness_weights.csv')
 rarities = df_weirdness[df_weirdness.columns[0]]
 weirdness_prompt = 'Select the level of weirdness for your characters'
-weirdness = st.radio(weirdness_prompt, df_weirdness.columns[1:], horizontal=True, index=1)
+weirdness_names = df_weirdness.columns[1:]
+weirdness = st.radio(weirdness_prompt, weirdness_names, horizontal=True, index=1)
 weights = df_weirdness[weirdness]
 weight_dict = dict(zip(rarities, weights))
 
